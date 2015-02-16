@@ -30,3 +30,4 @@ node_modules
 
 # specific
 config.json
+messages.js
