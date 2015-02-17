@@ -48,7 +48,7 @@ app.post('/',function(req,res) {
                     poster = hook.user_name
 
                     // Should we be specific ? 
-                    specific = Math.random() < 0.1 ? (poster in available_responses.specific): false
+                    specific = Math.random() < 0.1 ? (poster in available_responses.specific && available_responses.specific[poster].length > 0): false
                     if (specific) { // Yes
                         response = available_responses.specific[poster][Math.floor(Math.random() * available_responses.specific[poster].length)]
                     } else {
