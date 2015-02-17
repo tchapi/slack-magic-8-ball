@@ -55,6 +55,17 @@ app.post('/',function(req,res) {
                         response = available_responses.general[Math.floor(Math.random() * available_responses.general.length)]
                     }
 
+                    // Replace placeholders
+                    /*
+                        Currently supported :
+                        %username% => user_name
+                        %word% => a random word from the original post
+                    */
+                    var words = hook.text.split(/\W{1,}/); // Split by whitespace
+                    var randomWord = words[Math.floor(Math.random() * words.length)];
+                    response = response.replace(/%username%/g, '@'+poster);
+                    response = response.replace(/%word%/g, randomWord);
+
                     console.log("Responding to %s (on #%s): %s", poster, hook.channel_name, response)
 
                     return { 
