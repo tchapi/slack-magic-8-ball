@@ -61,7 +61,7 @@ app.post('/',function(req,res) {
                         %username% => user_name
                         %word% => a random word from the original post
                     */
-                    var words = hook.text.split(/\W{1,}/); // Split by whitespace
+                    var words = hook.text.split(/\s+/); // Split by whitespace
                     var randomWord = words[Math.floor(Math.random() * words.length)];
                     response = response.replace(/%username%/g, '@'+poster);
                     response = response.replace(/%word%/g, randomWord);
