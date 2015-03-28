@@ -40,7 +40,7 @@ app.post('/',function(req,res) {
 
             for (var i = triggers.length - 1; i >= 0; i--) {
 
-                if(hook.text.indexOf(triggers[i]) >= 0) {
+                if(hook.text && hook.text.toLowerCase().indexOf(triggers[i]) >= 0) {
 
                     // Our available responses
                     available_responses = messages[triggers[i]]
