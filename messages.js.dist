@@ -12,6 +12,8 @@ exports.messages['#triggerWord'] = {
     },
     general: [
         "Hi guys",
-        "Yes I'm here"
+        "Yes I'm here", 
+        "Did you just say %word% ?", 
+        "Hello %username% !"
     ]
 };
