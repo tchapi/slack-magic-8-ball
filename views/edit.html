@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
+  <style type="text/css">
+  body {
+    margin: 20px;
+  }
+  .json-editor-btn-delete {
+    color: #fff;
+    background-color: #f0ad4e;
+    border-color: #eea236;
+  }
+  .json-editor-btn-add {
+    color: #fff;
+    background-color: #5cb85c;
+    border-color: #4cae4c;
+  }
+  img {
+    width: 100px;
+    height: 100px;
+  }
+  </style>
+</head>
+<body>
+
+<h1>slack-magic-8-ball — bot edition <input id="submit" type="submit" value="Save all changes" class="btn btn-success btn-lg"></h1>
+<div id="editor_holder"></div>
+
+<script type="text/javascript" src="/static/jsoneditor.min.js"></script>
+<script type="text/javascript">
+
+  var element = document.getElementById('editor_holder');
+  var editor = new JSONEditor(element, {
+    
+    // The schema for the editor
+    schema: {
+      type: "array",
+      title: "Bots",
+      format: "tabs",
+      items: {
+        type: "object",
+        headerTemplate: "\{\{self.username\}\} (\{\{ self.trigger\}\})",
+        properties: {
+            username: {
+              type: "string",
+              title: "Username"
+            },
+            trigger: {
+              type: "string",
+              title: "Trigger word (case-insensitive — but including # if necessary)"
+            },
+            icon_url: {
+              type: "string",
+              format: "url",
+              title: "Avatar URL",
+              links: [
+                {
+                  "href": "\{\{self\}\}",
+                  "mediaType": "image"
+                }
+              ]
+            },
+            specific: {
+              type: "array",
+              title: "Specifics",
+              items: {
+                headerTemplate: "Specifics for \{\{self.username\}\}",
+                type: "object",
+                properties: {
+                  username: {
+                    title: "Username",
+                    type: "string",
+                  },
+                  messages: {
+                    type: "array",
+                    title: "Messages",
+                      items: {
+                        headerTemplate: "Message #\{\{i1\}\}",
+                       type: "string"
+                      }
+                  }
+                }
+              }
+            },
+            general: {
+              type: "array",
+              headerTemplate: "General messages",
+              description: "Some placeholders are available : <kbd>%username%</kbd> is replaced with the username of the poster, <kbd>%word%</kbd> is replaced with a random word from the original post.",
+              items: {
+                type: "string",
+                headerTemplate: "Message #\{\{i1\}\}",
+              }
+            }
+        }
+      }
+    },
+    
+    // Seed the form with a starting value
+    startval: {{ messages }},
+    
+    // Disable additional properties
+    no_additional_properties: true,
+    
+    // Require all properties by default
+    required_by_default: true,
+
+    disable_array_reorder: true,
+    disable_edit_json: true,
+    disable_properties: true,
+    disable_collapse: true,
+
+    theme: 'bootstrap3',
+    iconlib: "bootstrap3"
+
+  });
+
+  // Hook up the submit button to save our bot
+  document.getElementById('submit').addEventListener('click',function() {
+    // Get the value from the editor
+    messages = editor.getValue()
+    
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/save/{{ token }}", true);
+    xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+    xhr.send(JSON.stringify(messages));
+  });
+  
+</script>
+</body>
+</html>

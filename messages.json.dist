@@ -1,0 +1,26 @@
+[
+    {
+    "trigger": "#triggerWord",
+    "username": "User name",
+    "icon_url": "http://url.of.picture",
+    "specific": [
+      {
+        "username": "tom",
+        "messages": [
+          "Hi Tom !"
+        ]
+      },
+      {
+        "username": "john",
+        "messages": [
+          "What's up John ?"
+        ]
+      }
+    ],
+    "general": [
+        "Hi guys",
+        "Yes I'm here", 
+        "Did you just say %word% ?", 
+        "Hello %username% !"
+    ]
+};
