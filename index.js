@@ -84,109 +84,113 @@ app.post('/',function(req,res) {
 
     } else {
 
-        var reply = slack.respond(req.body,function(hook) {
+        var hook = req.body
 
-            // Poster
-            poster = hook.user_name
+        // Poster
+        poster = hook.user_name
 
-            for (var i = triggers.length - 1; i >= 0; i--) {
+        for (var i = triggers.length - 1; i >= 0; i--) {
 
-                if (hook.text && hook.text.toLowerCase().indexOf(triggers[i]) >= 0) {
+            if (hook.text && hook.text.toLowerCase().indexOf(triggers[i]) >= 0) {
 
-                    // Search for the correct bot — we know it exists :
-                    var bot = null;
-                    for (var k = 0; k < messages.length; k++) {
-                        if (messages[k].trigger === triggers[i]) {
-                            bot = messages[k]
-                            continue
-                        }
+                // Search for the correct bot — we know it exists :
+                var bot = null;
+                for (var k = 0; k < messages.length; k++) {
+                    if (messages[k].trigger === triggers[i]) {
+                        bot = messages[k]
+                        continue
                     }
-
-                    // Should we be specific ?
-                    specifics = null 
-                    for (var k = 0; k < bot.specific.length; k++) {
-                        if (bot.specific[k].username === poster) {
-                            specifics = bot.specific[k].messages
-                            continue
-                        }
-                    }
-                    specific = Math.random() < 0.1 ? (specifics !== null && specifics.length > 0): false
-                    if (specific) {
-                        response = specifics[Math.floor(Math.random() * specifics.length)]
-                    } else {
-                        response = bot.general[Math.floor(Math.random() * bot.general.length)]
-                    }
-
-                    // Replace placeholders
-                    /*
-                        Currently supported :
-                        %username% => user_name
-                        %word% => a random word from the original post
-                    */
-                    var words = hook.text.split(/\s+/) // Split by whitespace
-                    var randomWord = words[Math.floor(Math.random() * words.length)]
-                    response = response.replace(/%username%/g, '@'+poster)
-                    response = response.replace(/%word%/g, randomWord)
-
-                    console.log("Responding to %s (on #%s): %s", poster, hook.channel_name, response)
-
-                    return { 
-                        text: response,
-                        username: bot.username, 
-                        icon_url: bot.icon_url
-                    }
-
                 }
 
-            }
-
-            //console.log("Didn't trigger :", hook.text)
-
-            // No triggers were found, should we spell-check ?
-            if (hook.text && spell_check && spell_check_users.indexOf(poster) >= 0) {
-                //console.log("Checking French grammar & syntax for :", poster)
-
-                request.post(
-                    'https://languagetool.org:8081',
-                    { 'form' : {'language' : 'fr', 'text': hook.text, 'disabled': "UPPERCASE_SENTENCE_START,HUNSPELL_NO_SUGGEST_RULE,FRENCH_WHITESPACE"} },
-                    function (error, response, body) {
-                        if (!error && response.statusCode == 200) {
-
-                            parseString(body, function (err, result) {
-                                if (result.matches.error) {
-                                    var nb_errors = result.matches.error.length
-                                    if (nb_errors > 0) {
-                                        for (var k = 0; k < nb_errors; k++) {
-                                            var ob = result.matches.error[k]['$']
-                                            response = "> ... " + hook.text.substring(ob.fromx, ob.tox) + " ..." + "\n" + "— @" + poster + "\n" + "_(@" + poster + ", " + ob.msg.toLowerCase() + /*" — " + ob.ruleId +*/")_"
-                                            console.log("Responding to %s (on #%s): %s", poster, hook.channel_name, response)
-
-                                            return { 
-                                                text: response,
-                                                username: generalConfig.get('spell_check_bot_username'), 
-                                                icon_url: generalConfig.get('spell_check_icon_url'),
-                                            }
-
-                                        }
-
-                                    } else {
-                                        //console.log("Spell-check was correct for :", hook.text)
-                                    }
-                                }
-                            })
-                        } else {
-                            //console.log("There has been an error processing the request :", body)
-                        }
+                // Should we be specific ?
+                specifics = null 
+                for (var k = 0; k < bot.specific.length; k++) {
+                    if (bot.specific[k].username === poster) {
+                        specifics = bot.specific[k].messages
+                        continue
                     }
-                )
+                }
+                specific = Math.random() < 0.1 ? (specifics !== null && specifics.length > 0): false
+                if (specific) {
+                    response = specifics[Math.floor(Math.random() * specifics.length)]
+                } else {
+                    response = bot.general[Math.floor(Math.random() * bot.general.length)]
+                }
 
-            } else {
-                //console.log("Really nothing to do :", hook.text)
+                // Replace placeholders
+                /*
+                    Currently supported :
+                    %username% => user_name
+                    %word% => a random word from the original post
+                */
+                var words = hook.text.split(/\s+/) // Split by whitespace
+                var randomWord = words[Math.floor(Math.random() * words.length)]
+                response = response.replace(/%username%/g, '@'+poster)
+                response = response.replace(/%word%/g, randomWord)
+
+                console.log("Responding to %s (on #%s): %s", poster, hook.channel_name, response)
+
+                res.json({ 
+                    text: response,
+                    username: bot.username, 
+                    icon_url: bot.icon_url
+                })
+                return
+
             }
-            
-        })
 
-        res.json(reply)
+        }
+
+        console.log("Didn't trigger :", hook.text)
+
+        // No triggers were found, should we spell-check ?
+        if (hook.text && spell_check && spell_check_users.indexOf(poster) >= 0) {
+            console.log("Checking French grammar & syntax for :", poster)
+
+            request.post(
+                'https://languagetool.org:8081',
+                { 'form' : {'language' : 'fr', 'text': hook.text, 'disabled': "UPPERCASE_SENTENCE_START,HUNSPELL_NO_SUGGEST_RULE,FRENCH_WHITESPACE"} },
+                function (error, response, body) {
+                    if (!error && response.statusCode == 200) {
+
+                        parseString(body, function (err, result) {
+                            if (result.matches.error && result.matches.error.length > 0) {
+                                var nb_errors = result.matches.error.length
+
+                                for (var k = 0; k < nb_errors; k++) {
+                                    var ob = result.matches.error[k]['$']
+                                    response = "> ... " + hook.text.substring(ob.fromx, ob.tox) + " ..." + "\n" + "— @" + poster + "\n" + "_(@" + poster + ", " + ob.msg.toLowerCase() + /*" — " + ob.ruleId +*/")_"
+                                    console.log("Responding to %s (on #%s): %s", poster, hook.channel_name, response)
+
+                                    res.json({ 
+                                        text: response,
+                                        username: generalConfig.get('spell_check_bot_username'), 
+                                        icon_url: generalConfig.get('spell_check_icon_url'),
+                                    })
+                                    return
+
+                                }
+
+                            } else {
+                                console.log("Spell-check was correct for :", hook.text)
+                                res.json({})
+                                return
+                            }
+                        })
+                    } else {
+                        console.log("There has been an error processing the request :", body)
+                        res.json({})
+                        return
+                    }
+                }
+            )
+
+        } else {
+            console.log("Really nothing to do :", hook.text)
+            res.json({})
+            return
+        }
+        
     }
 
 });
