@@ -30,4 +30,5 @@ node_modules
 
 # specific
 config.json
+general.json
 messages.json
