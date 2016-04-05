@@ -21,7 +21,7 @@
           "Hi guys",
           "Yes I'm here", 
           "Did you just say %word% ?", 
-          "Hello %username% !"
+          "Hello <%username%> !"
       ]
     }
 ]

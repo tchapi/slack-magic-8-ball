@@ -159,7 +159,7 @@ app.post('/',function(req,res) {
 
                                 for (var k = 0; k < nb_errors; k++) {
                                     var ob = result.matches.error[k]['$']
-                                    response = "> ... " + hook.text.substring(ob.fromx, ob.tox) + " ..." + "\n" + "— @" + poster + "\n" + "_(@" + poster + ", " + ob.msg.toLowerCase() + /*" — " + ob.ruleId +*/")_"
+                                    response = "> ... " + hook.text.substring(ob.fromx, ob.tox) + " ..." + "\n" + "— <@" + poster + ">\n" + "_(<@" + poster + ">, " + ob.msg.toLowerCase() + /*" — " + ob.ruleId +*/")_"
                                     console.log("Responding to %s (on #%s): %s", poster, hook.channel_name, response)
 
                                     res.json({ 
