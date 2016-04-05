@@ -141,7 +141,7 @@ app.post('/',function(req,res) {
 
         }
 
-        console.log("Didn't trigger :", hook.text)
+        //console.log("Didn't trigger :", hook.text)
 
         // No triggers were found, should we spell-check ?
         if (hook.text && spell_check && spell_check_users.indexOf(poster) >= 0) {
@@ -172,13 +172,13 @@ app.post('/',function(req,res) {
                                 }
 
                             } else {
-                                console.log("Spell-check was correct for :", hook.text)
+                                //console.log("Spell-check was correct for :", hook.text)
                                 res.json({})
                                 return
                             }
                         })
                     } else {
-                        console.log("There has been an error processing the request :", body)
+                        //console.log("There has been an error processing the request :", body)
                         res.json({})
                         return
                     }
@@ -186,7 +186,7 @@ app.post('/',function(req,res) {
             )
 
         } else {
-            console.log("Really nothing to do :", hook.text)
+            //console.log("Really nothing to do :", hook.text)
             res.json({})
             return
         }

@@ -1,5 +1,7 @@
 {
-  "spell-check" : false,
+  "spell-check" : true,
+  "spell_check_bot_username": "User X Spell Checker",
+  "spell_check_icon_url": "http://url.of.picture",
   "spell-check-users": [
     "user_x"
   ]
