@@ -2,6 +2,12 @@
   "spell-check" : true,
   "spell_check_bot_username": "User X Spell Checker",
   "spell_check_icon_url": "http://url.of.picture",
+  "spell_check_ignored_rules" :  [
+    "UPPERCASE_SENTENCE_START",
+    "HUNSPELL_NO_SUGGEST_RULE",
+    "FRENCH_WHITESPACE",
+    "UNPAIRED_BRACKETS"
+  ],
   "spell-check-users": [
     "user_x"
   ]

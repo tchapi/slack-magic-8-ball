@@ -151,7 +151,7 @@ app.post('/',function(req,res) {
 
             request.post(
                 'https://languagetool.org:8081',
-                { 'form' : {'language' : 'fr', 'text': clean_text, 'disabled': "UPPERCASE_SENTENCE_START,HUNSPELL_NO_SUGGEST_RULE,FRENCH_WHITESPACE"} },
+                { 'form' : {'language' : 'fr', 'text': clean_text, 'disabled': generalConfig.get('spell_check_ignored_rules').join()} },
                 function (error, response, body) {
                     if (!error && response.statusCode == 200) {
 
