@@ -147,9 +147,11 @@ app.post('/',function(req,res) {
         if (hook.text && spell_check && spell_check_users.indexOf(poster) >= 0) {
             console.log("Checking French grammar & syntax for :", poster)
 
+            var clean_text = hook.text.replace(/ *\:[^:]*\: */g, " ")
+
             request.post(
                 'https://languagetool.org:8081',
-                { 'form' : {'language' : 'fr', 'text': hook.text, 'disabled': "UPPERCASE_SENTENCE_START,HUNSPELL_NO_SUGGEST_RULE,FRENCH_WHITESPACE"} },
+                { 'form' : {'language' : 'fr', 'text': clean_text, 'disabled': "UPPERCASE_SENTENCE_START,HUNSPELL_NO_SUGGEST_RULE,FRENCH_WHITESPACE"} },
                 function (error, response, body) {
                     if (!error && response.statusCode == 200) {
 
@@ -159,7 +161,8 @@ app.post('/',function(req,res) {
 
                                 for (var k = 0; k < nb_errors; k++) {
                                     var ob = result.matches.error[k]['$']
-                                    response = "> ... " + hook.text.substring(ob.fromx, ob.tox) + " ..." + "\n" + "— <@" + poster + ">\n" + "_(<@" + poster + ">, " + ob.msg.toLowerCase() + /*" — " + ob.ruleId +*/")_"
+                                    response = "> ... " + clean_text.substring(ob.fromx, ob.tox) + " ..." + "\n" + "— <@" + poster + ">\n" + "_(<@" + poster + ">, " + ob.msg.toLowerCase() + /*" — " + ob.ruleId +*/")_"
+                                    console.log("Triggered Rule ID : %s (Category : %s)", ob.ruleId, ob.categoryid)
                                     console.log("Responding to %s (on #%s): %s", poster, hook.channel_name, response)
 
                                     res.json({ 
