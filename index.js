@@ -34,6 +34,7 @@ var triggers = messages.map(function(e){return e.trigger})
 var generalConfig = new CONFIG({filename : 'general.json'})
 var spell_check = generalConfig.get('spell-check')
 var spell_check_users = generalConfig.get('spell-check-users')
+var spell_check_ignored_categories = generalConfig.get('spell_check_ignored_categories')
 
 var slack = new Slack(config.get('domain'),config.get('api_token'))
 
@@ -161,6 +162,12 @@ app.post('/',function(req,res) {
 
                                 for (var k = 0; k < nb_errors; k++) {
                                     var ob = result.matches.error[k]['$']
+
+                                    // We ignore some categories
+                                    if (spell_check_ignored_categories.indexOf(ob.categoryid) >= 0) {
+                                        continue;
+                                    }
+
                                     response = "> ... " + clean_text.substring(ob.fromx, ob.tox) + " ..." + "\n" + "— <@" + poster + ">\n" + "_(<@" + poster + ">, " + ob.msg.toLowerCase() + /*" — " + ob.ruleId +*/")_"
                                     console.log("Triggered Rule ID : %s (Category : %s)", ob.ruleId, ob.categoryid)
                                     console.log("Responding to %s (on #%s): %s", poster, hook.channel_name, response)

@@ -6,7 +6,12 @@
     "UPPERCASE_SENTENCE_START",
     "HUNSPELL_NO_SUGGEST_RULE",
     "FRENCH_WHITESPACE",
-    "UNPAIRED_BRACKETS"
+    "UNPAIRED_BRACKETS",
+    "ELISION",
+    "HEURES"
+  ],
+  "spell_check_ignored_categories" :  [
+    "CAT_ANGLICISMES"
   ],
   "spell-check-users": [
     "user_x"
