@@ -148,7 +148,8 @@ app.post('/',function(req,res) {
         if (hook.text && spell_check && spell_check_users.indexOf(poster) >= 0) {
             console.log("Checking French grammar & syntax for :", poster)
 
-            var clean_text = hook.text.replace(/ *\:[^:]*\: */g, " ")
+            var clean_text = hook.text.replace(/ *\:[^:]*\: */g, " ") // remove smileys, emoticons
+                clean_text = clean_text.replace(/ *\`\`\`[^:]*\`\`\` */g, " ") // remove code
 
             request.post(
                 'https://languagetool.org:8081',
@@ -180,6 +181,10 @@ app.post('/',function(req,res) {
                                     return
 
                                 }
+                                
+                                //console.log("Spell-check returned no error :", hook.text)
+                                res.json({})
+                                return
 
                             } else {
                                 //console.log("Spell-check was correct for :", hook.text)
