@@ -1,0 +1,12 @@
+# exclude.rsync
+.DS_Store
+.gitignore
+.git
+.svn
+svn-commit*
+*.swp
+exclude.rsync
+README.md
+crontabs
+LICENSE
+*.json.dist
