@@ -4,7 +4,6 @@ var nunjucks = require('nunjucks')
 var Slack = require('node-slack')
 
 var request = require('request')
-var parseString = require('xml2js').parseString
 
 var app = express()
 
@@ -152,46 +151,46 @@ app.post('/',function(req,res) {
                 clean_text = clean_text.replace(/ *\`\`\`[^:]*\`\`\` */g, " ") // remove code
 
             request.post(
-                'https://languagetool.org:8081',
-                { 'form' : {'language' : 'fr', 'text': clean_text, 'disabled': generalConfig.get('spell_check_ignored_rules').join()} },
+                'https://languagetool.org/api/v2/check',
+                { 'form' : {'language' : 'fr', 'text': clean_text, 'disabledRules': generalConfig.get('spell_check_ignored_rules').join()} },
                 function (error, response, body) {
+
+                    result = JSON.parse(body)
+
                     if (!error && response.statusCode == 200) {
+                        if (result.matches.length > 0) {
+                            var nb_errors = result.matches.length
 
-                        parseString(body, function (err, result) {
-                            if (result.matches.error && result.matches.error.length > 0) {
-                                var nb_errors = result.matches.error.length
+                            for (var k = 0; k < nb_errors; k++) {
+                                var ob = result.matches[k]
 
-                                for (var k = 0; k < nb_errors; k++) {
-                                    var ob = result.matches.error[k]['$']
-
-                                    // We ignore some categories
-                                    if (spell_check_ignored_categories.indexOf(ob.categoryid) >= 0) {
-                                        continue;
-                                    }
-
-                                    response = "> ... " + clean_text.substring(ob.fromx, ob.tox) + " ..." + "\n" + "— <@" + poster + ">\n" + "_(<@" + poster + ">, " + ob.msg.toLowerCase() + /*" — " + ob.ruleId +*/")_"
-                                    console.log("Triggered Rule ID : %s (Category : %s)", ob.ruleId, ob.categoryid)
-                                    console.log("Responding to %s (on #%s): %s", poster, hook.channel_name, response)
-
-                                    res.json({ 
-                                        text: response,
-                                        username: generalConfig.get('spell_check_bot_username'), 
-                                        icon_url: generalConfig.get('spell_check_icon_url'),
-                                    })
-                                    return
-
+                                // We ignore some categories
+                                if (spell_check_ignored_categories.indexOf(ob.rule.category.id) >= 0) {
+                                    continue;
                                 }
-                                
-                                //console.log("Spell-check returned no error :", hook.text)
-                                res.json({})
+
+                                response = "> ... " + clean_text.substring(ob.offset, ob.offset + ob['length']) + " ..." + "\n" + "_(<@" + poster + ">, " + ob.message.toLowerCase() + /*" — " + ob.ruleId +*/")_"
+                                console.log("Triggered Rule ID : %s (Category : %s)", ob.rule.id, ob.rule.category.id)
+                                console.log("Responding to %s (on #%s): %s", poster, hook.channel_name, response)
+
+                                res.json({ 
+                                    text: response,
+                                    username: generalConfig.get('spell_check_bot_username'), 
+                                    icon_url: generalConfig.get('spell_check_icon_url'),
+                                })
                                 return
 
-                            } else {
-                                //console.log("Spell-check was correct for :", hook.text)
-                                res.json({})
-                                return
                             }
-                        })
+                            
+                            //console.log("Spell-check returned no error :", hook.text)
+                            res.json({})
+                            return
+
+                        } else {
+                            //console.log("Spell-check was correct for :", hook.text)
+                            res.json({})
+                            return
+                        }
                     } else {
                         //console.log("There has been an error processing the request :", body)
                         res.json({})

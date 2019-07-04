@@ -13,7 +13,6 @@
     "express": "^4.11.2",
     "node-slack": "0.0.5",
     "nunjucks": "^1.2.0",
-    "request": "^2.70.0",
-    "xml2js": "^0.4.16"
+    "request": "^2.70.0"
   }
 }
