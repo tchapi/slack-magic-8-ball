@@ -128,9 +128,14 @@ app.post('/',function(req,res) {
                     %word% => a random word from the original post
                 */
                 var words = hook.text.split(/\s+/) // Split by whitespace
-                var randomWord = words[Math.floor(Math.random() * words.length)]
                 response = response.replace(/%username%/g, '@'+poster)
-                response = response.replace(/%word%/g, randomWord)
+
+                if (words.length > 2) {
+                    var randomWord = words[Math.floor(Math.random() * words.length)]
+                    response = response.replace(/%word%/g, randomWord)
+                } else {
+                    response = response.replace(/%word%/g, '@'+poster) // Dirty fallback bu we have nothing else
+                }
 
                 console.log("Responding to %s (on #%s): %s", poster, hook.channel_name, response)
 
