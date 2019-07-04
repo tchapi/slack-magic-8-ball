@@ -102,6 +102,10 @@ app.post('/',function(req,res) {
                     }
                 }
 
+                if (bot === null) {
+                    continue
+                }
+
                 // Should we be specific ?
                 specifics = null 
                 for (var k = 0; k < bot.specific.length; k++) {
