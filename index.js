@@ -197,7 +197,9 @@ app.message(async ({ ack, message }) => {
             // const result = await app.client.chat.postMessage({
             //   token: process.env.SLACK_BOT_TOKEN,
             //   channel: message.channel_id,
-            //   text: responseObject.text
+            //   text: responseObject.text,
+            //   username: responseObject.username,
+            //   icon_url: responseObject.icon_url
             // });
         }
         catch (error) {
