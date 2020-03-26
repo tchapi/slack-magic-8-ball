@@ -1,7 +1,0 @@
-{
-  "port" : 3030,
-  
-  "api_token" : "xoxb-something",
-  "payload_token" : "generated",
-  "domain" : "yourdomainWithoutSlackDotCom"
-}

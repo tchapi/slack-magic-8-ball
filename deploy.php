@@ -27,11 +27,9 @@ set('clear_paths', [
   './deploy.php',
   './.gitignore',
   './LICENSE',
-  './structure.sqlite',
   './config.json.dist',
   './general.json.dist',
   './messages.json.dist',
-  './_SOURCES_',
   './.git',
   './deploy',
 ]);
