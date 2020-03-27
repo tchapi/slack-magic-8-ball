@@ -81,7 +81,7 @@ receiver.app.post('/save/:token', function (req,res) {
 
 app.message(async ({ message }) => {
 
-    const responseObject = null;
+    let responseObject = null;
 
     // Poster
     poster = message.user
