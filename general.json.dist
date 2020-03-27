@@ -1,4 +1,7 @@
 {
+  "users-display-names": {
+    "SLACK_ID": "display_name"
+  },
   "spell-check" : true,
   "spell_check_bot_username": "User X Spell Checker",
   "spell_check_icon_url": "http://url.of.picture",

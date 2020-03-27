@@ -42,6 +42,7 @@ var messages = messagesConfig.getConfig();
 var triggers = messages.map(function(e){return e.trigger});
 
 var generalConfig = new CONFIG({filename : 'general.json'});
+var users_display_names = generalConfig.get('users-display-names');
 var spell_check = generalConfig.get('spell-check');
 var spell_check_users = generalConfig.get('spell-check-users');
 var spell_check_ignored_categories = generalConfig.get('spell_check_ignored_categories');
@@ -78,18 +79,12 @@ receiver.app.post('/save/:token', function (req,res) {
     }
 });
 
-app.message(async ({ ack, message }) => {
-    ack();
-    console.log(message)
-    return;
-    if (message.channel_id !== '') {
-
-    }
+app.message(async ({ message }) => {
 
     const responseObject = null;
 
     // Poster
-    poster = message.user_name
+    poster = message.user
 
     for (var i = triggers.length - 1; i >= 0; i--) {
 
@@ -130,13 +125,13 @@ app.message(async ({ ack, message }) => {
                 %word% => a random word from the original post
             */
             var words = message.text.split(/\s+/) // Split by whitespace
-            response = response.replace(/%username%/g, '@'+poster)
+            response = response.replace(/%username%/g, '<@' + poster + '>')
 
             if (words.length > 2) {
                 var randomWord = words[Math.floor(Math.random() * words.length)]
                 response = response.replace(/%word%/g, randomWord)
             } else {
-                response = response.replace(/%word%/g, '@' + poster) // Dirty fallback but we have nothing else
+                response = response.replace(/%word%/g, '<@' + poster + '>') // Dirty fallback but we have nothing else
             }
 
             responseObject = {
@@ -149,7 +144,7 @@ app.message(async ({ ack, message }) => {
 
     // No triggers were found, should we spell-check ?
     if (!responseObject && message.text && spell_check && spell_check_users.indexOf(poster) >= 0) {
-        console.log("Checking French grammar & syntax for: ", poster)
+        console.log("Checking French grammar & syntax for: ", users_display_names[poster])
 
         var clean_text = message.text.replace(/ *\:[^:]*\: */g, " ") // remove smileys, emoticons
             clean_text = clean_text.replace(/ *\`\`\`[^:]*\`\`\` */g, " ") // remove code
@@ -191,12 +186,12 @@ app.message(async ({ ack, message }) => {
 
     if (responseObject) {
         // Post a message if needed
-        console.log(`Responding to ${poster} (on #{message.channel_name}):`)
+        console.log(`Responding to ${users_display_names[poster]} (on #{message.channel}):`)
         console.log(responseObject)
         try {
             // const result = await app.client.chat.postMessage({
             //   token: process.env.SLACK_BOT_TOKEN,
-            //   channel: message.channel_id,
+            //   channel: message.channel,
             //   text: responseObject.text,
             //   username: responseObject.username,
             //   icon_url: responseObject.icon_url
