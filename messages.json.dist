@@ -2,7 +2,7 @@
     {
       "trigger": "#triggerWord",
       "username": "User name",
-      "icon_url": "http://url.of.picture",
+      "icon_url": "https://url.of.picture",
       "specific": [
         {
           "username": "tom",

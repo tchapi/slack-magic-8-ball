@@ -1,12 +1,12 @@
-console.log("\n    « Beseech and thou shall hath an answer »\n")
+console.log(`\n    « Beseech and thou shall hath an answer »\n`)
 
 const serveStatic = require('serve-static')
 const bodyParser = require('body-parser')
 const nunjucks = require('nunjucks')
 const fetch = require('node-fetch')
 const { URLSearchParams } = require('url')
-const { App, LogLevel, ExpressReceiver } = require('@slack/bolt');
-const dotenv = require('dotenv');
+const { App, LogLevel, ExpressReceiver } = require('@slack/bolt')
+const dotenv = require('dotenv')
 const CONFIG = require('./services/ConfigParser')
 
 dotenv.config()
@@ -19,11 +19,7 @@ const receiver = new ExpressReceiver({
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   receiver: receiver,
-  logLevel: LogLevel.INFO,
-  // endpoints: { // Just for reference since there is no documentation for that
-  //   events: '/slack/events',
-  //   commands: '/slack/events' 
-  // }
+  logLevel: LogLevel.INFO
 });
 
 receiver.app.use(bodyParser.urlencoded({ extended: false }))
@@ -48,10 +44,10 @@ var spell_check = generalConfig.get('spell-check');
 var spell_check_users = generalConfig.get('spell-check-users');
 var spell_check_ignored_categories = generalConfig.get('spell_check_ignored_categories');
 
-console.log('  Available triggers :', triggers)
+console.log('🧰 Available triggers:', triggers)
 
 if (spell_check) {
-    console.log('🔤 Spell-checking active for :', spell_check_users)
+    console.log('🔤 Spell-checking active for:', spell_check_users)
 } else {
     console.log('🔤 Spell-checking inactive.')
 }
@@ -75,7 +71,7 @@ receiver.app.post('/save/:token', function (req,res) {
     } else {
         messagesConfig.writeJsonObject(req.body)
         // We need to recompute the triggers
-        triggers = messagesConfig.getConfig().map(function(e){return e.trigger})
+        triggers = messagesConfig.getConfig().map(e => e.trigger)
         res.end()
     }
 });
@@ -171,7 +167,7 @@ app.message(async ({ message }) => {
                         continue;
                     }
 
-                    text = '> ... ' + clean_text.substring(ob.offset, ob.offset + ob['length']) + " ..." + "\n" + "_(<@" + poster + ">, " + ob.message.toLowerCase() + /*" — " + ob.ruleId +*/")_"
+                    text = '> ... ' + clean_text.substring(ob.offset, ob.offset + ob['length']) + ' ...' + '\n' + '_(<@' + poster + '>, ' + ob.message.toLowerCase() + /*' — ' + ob.ruleId +*/')_'
                     console.log(`Triggered Rule ID : ${ob.rule.id} (Category : ${ob.rule.category.id})`)
 
                     responseObject = {
