@@ -40,6 +40,7 @@ var triggers = messages.map(function(e){return e.trigger});
 
 var generalConfig = new CONFIG({filename : 'general.json'});
 var users_display_names = generalConfig.get('users-display-names');
+var channels_display_names = generalConfig.get('channels-display-names');
 var spell_check = generalConfig.get('spell-check');
 var spell_check_users = generalConfig.get('spell-check-users');
 var spell_check_ignored_categories = generalConfig.get('spell_check_ignored_categories');
@@ -168,7 +169,7 @@ app.message(async ({ message }) => {
                     }
 
                     text = '> ... ' + clean_text.substring(ob.offset, ob.offset + ob['length']) + ' ...' + '\n' + '_(<@' + poster + '>, ' + ob.message.toLowerCase() + /*' — ' + ob.ruleId +*/')_'
-                    console.log(`Triggered Rule ID : ${ob.rule.id} (Category : ${ob.rule.category.id})`)
+                    console.log(`Triggered Rule ID: ${ob.rule.id} (Category: ${ob.rule.category.id})`)
 
                     responseObject = {
                         text: text,
@@ -185,7 +186,7 @@ app.message(async ({ message }) => {
 
     if (responseObject) {
         // Post a message if needed
-        console.log(`Responding to ${users_display_names[poster]} (on #{message.channel}):`)
+        console.log(`💬 Responding to ${users_display_names[poster] || poster} (on ${channels_display_names[message.channel] || message.channel}):`)
         console.log(responseObject)
         try {
             const result = await app.client.chat.postMessage({
