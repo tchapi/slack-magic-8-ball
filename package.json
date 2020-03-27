@@ -12,8 +12,8 @@
     "@slack/bolt": "^1.8.0",
     "body-parser": "^1.12.0",
     "dotenv": "^8.2.0",
+    "node-fetch": "^2.6.0",
     "nunjucks": "^3.2.0",
-    "request": "^2.70.0",
     "serve-static": "^1.14.1"
   }
 }

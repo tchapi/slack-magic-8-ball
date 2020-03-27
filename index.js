@@ -3,13 +3,14 @@ console.log("\n    « Beseech and thou shall hath an answer »\n")
 const serveStatic = require('serve-static')
 const bodyParser = require('body-parser')
 const nunjucks = require('nunjucks')
-const request = require('request')
+const fetch = require('node-fetch')
+const { URLSearchParams } = require('url')
 const { App, LogLevel, ExpressReceiver } = require('@slack/bolt');
 const dotenv = require('dotenv');
 const CONFIG = require('./services/ConfigParser')
 
 dotenv.config()
-console.log("🛠  Config read from .env file")
+console.log('🛠  Config read from .env file')
 
 const receiver = new ExpressReceiver({
   signingSecret: process.env.SLACK_SIGNING_SECRET
@@ -149,39 +150,41 @@ app.message(async ({ message }) => {
         var clean_text = message.text.replace(/ *\:[^:]*\: */g, " ") // remove smileys, emoticons
             clean_text = clean_text.replace(/ *\`\`\`[^:]*\`\`\` */g, " ") // remove code
 
-        request.post(
-            'https://languagetool.org/api/v2/check',
-            { 'form' : {'language' : 'fr', 'text': clean_text, 'disabledRules': generalConfig.get('spell_check_ignored_rules').join()} },
-            function (error, response, body) {
 
-                result = JSON.parse(body)
+        const params = new URLSearchParams();
+        params.append('language', 'fr');
+        params.append('text', clean_text);
+        params.append('disabledRules', generalConfig.get('spell_check_ignored_rules').join());
 
-                if (!error && response.statusCode == 200) {
-                    if (result.matches.length > 0) {
-                        var nb_errors = result.matches.length
+        try {
+            const response = await fetch('https://languagetool.org/api/v2/check', { method: 'POST', body: params });
+            const result = await response.json();
+            
+            if (result.matches.length > 0) {
+                var nb_errors = result.matches.length
 
-                        for (var k = 0; k < nb_errors; k++) {
-                            var ob = result.matches[k]
+                for (var k = 0; k < nb_errors; k++) {
+                    var ob = result.matches[k]
 
-                            // We ignore some categories
-                            if (spell_check_ignored_categories.indexOf(ob.rule.category.id) >= 0) {
-                                continue;
-                            }
-
-                            response = "> ... " + clean_text.substring(ob.offset, ob.offset + ob['length']) + " ..." + "\n" + "_(<@" + poster + ">, " + ob.message.toLowerCase() + /*" — " + ob.ruleId +*/")_"
-                            console.log("Triggered Rule ID : %s (Category : %s)", ob.rule.id, ob.rule.category.id)
-
-                            responseObject = {
-                                text: response,
-                                username: generalConfig.get('spell_check_bot_username'), 
-                                icon_url: generalConfig.get('spell_check_icon_url'),
-                            }
-                            break
-                        }
+                    // We ignore some categories
+                    if (spell_check_ignored_categories.indexOf(ob.rule.category.id) >= 0) {
+                        continue;
                     }
+
+                    response = "> ... " + clean_text.substring(ob.offset, ob.offset + ob['length']) + " ..." + "\n" + "_(<@" + poster + ">, " + ob.message.toLowerCase() + /*" — " + ob.ruleId +*/")_"
+                    console.log("Triggered Rule ID : %s (Category : %s)", ob.rule.id, ob.rule.category.id)
+
+                    responseObject = {
+                        text: response,
+                        username: generalConfig.get('spell_check_bot_username'), 
+                        icon_url: generalConfig.get('spell_check_icon_url'),
+                    }
+                    break
                 }
             }
-        )
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     if (responseObject) {
@@ -189,13 +192,13 @@ app.message(async ({ message }) => {
         console.log(`Responding to ${users_display_names[poster]} (on #{message.channel}):`)
         console.log(responseObject)
         try {
-            // const result = await app.client.chat.postMessage({
-            //   token: process.env.SLACK_BOT_TOKEN,
-            //   channel: message.channel,
-            //   text: responseObject.text,
-            //   username: responseObject.username,
-            //   icon_url: responseObject.icon_url
-            // });
+            const result = await app.client.chat.postMessage({
+              token: process.env.SLACK_BOT_TOKEN,
+              channel: message.channel,
+              text: responseObject.text,
+              username: responseObject.username,
+              icon_url: responseObject.icon_url
+            });
         }
         catch (error) {
             console.error(error);
