@@ -48,17 +48,17 @@ var spell_check = generalConfig.get('spell-check');
 var spell_check_users = generalConfig.get('spell-check-users');
 var spell_check_ignored_categories = generalConfig.get('spell_check_ignored_categories');
 
-console.log("  Available triggers :", triggers)
+console.log('  Available triggers :', triggers)
 
 if (spell_check) {
-    console.log("🔤 Spell-checking active for :", spell_check_users)
+    console.log('🔤 Spell-checking active for :', spell_check_users)
 } else {
-    console.log("🔤 Spell-checking inactive.")
+    console.log('🔤 Spell-checking inactive.')
 }
 
 receiver.app.get('/', function (req,res) {
     if (req.query.token != process.env.ACCESS_TOKEN) {
-        console.log("Bad token :", req.query.token)
+        console.log(`Bad token ${req.params.token}`)
         res.status(403).end()
     } else {
         res.render('edit.html', {
@@ -70,7 +70,7 @@ receiver.app.get('/', function (req,res) {
 
 receiver.app.post('/save/:token', function (req,res) {
     if (req.params.token != process.env.ACCESS_TOKEN) {
-        console.log("Bad token :", req.params.token)
+        console.log(`Bad token ${req.params.token}`)
         res.status(403).end()
     } else {
         messagesConfig.writeJsonObject(req.body)
@@ -145,7 +145,7 @@ app.message(async ({ message }) => {
 
     // No triggers were found, should we spell-check ?
     if (!responseObject && message.text && spell_check && spell_check_users.indexOf(poster) >= 0) {
-        console.log("Checking French grammar & syntax for: ", users_display_names[poster])
+        console.log(`Checking French grammar & syntax for: ${users_display_names[poster]}`)
 
         var clean_text = message.text.replace(/ *\:[^:]*\: */g, " ") // remove smileys, emoticons
             clean_text = clean_text.replace(/ *\`\`\`[^:]*\`\`\` */g, " ") // remove code
@@ -171,11 +171,11 @@ app.message(async ({ message }) => {
                         continue;
                     }
 
-                    response = "> ... " + clean_text.substring(ob.offset, ob.offset + ob['length']) + " ..." + "\n" + "_(<@" + poster + ">, " + ob.message.toLowerCase() + /*" — " + ob.ruleId +*/")_"
-                    console.log("Triggered Rule ID : %s (Category : %s)", ob.rule.id, ob.rule.category.id)
+                    text = '> ... ' + clean_text.substring(ob.offset, ob.offset + ob['length']) + " ..." + "\n" + "_(<@" + poster + ">, " + ob.message.toLowerCase() + /*" — " + ob.ruleId +*/")_"
+                    console.log(`Triggered Rule ID : ${ob.rule.id} (Category : ${ob.rule.category.id})`)
 
                     responseObject = {
-                        text: response,
+                        text: text,
                         username: generalConfig.get('spell_check_bot_username'), 
                         icon_url: generalConfig.get('spell_check_icon_url'),
                     }
