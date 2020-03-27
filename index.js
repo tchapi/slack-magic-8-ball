@@ -34,16 +34,16 @@ nunjucks.configure('views', {
     express: receiver.app
 })
 
-var messagesConfig = new CONFIG({filename : 'messages.json'});
-var messages = messagesConfig.getConfig();
-var triggers = messages.map(function(e){return e.trigger});
+let messagesConfig = new CONFIG({filename : 'messages.json'});
+let messages = messagesConfig.getConfig();
+let triggers = messages.map(function(e){return e.trigger});
 
-var generalConfig = new CONFIG({filename : 'general.json'});
-var users_display_names = generalConfig.get('users-display-names');
-var channels_display_names = generalConfig.get('channels-display-names');
-var spell_check = generalConfig.get('spell-check');
-var spell_check_users = generalConfig.get('spell-check-users');
-var spell_check_ignored_categories = generalConfig.get('spell_check_ignored_categories');
+const generalConfig = new CONFIG({filename : 'general.json'});
+const users_display_names = generalConfig.get('users-display-names');
+const channels_display_names = generalConfig.get('channels-display-names');
+const spell_check = generalConfig.get('spell-check');
+const spell_check_users = generalConfig.get('spell-check-users');
+const spell_check_ignored_categories = generalConfig.get('spell_check_ignored_categories');
 
 console.log('🧰 Available triggers:', triggers)
 
@@ -84,13 +84,13 @@ app.message(async ({ message }) => {
     // Poster
     poster = message.user
 
-    for (var i = triggers.length - 1; i >= 0; i--) {
+    for (let i = triggers.length - 1; i >= 0; i--) {
 
         if (message.text && message.text.toLowerCase().indexOf(triggers[i]) >= 0) {
 
             // Search for the correct bot — we know it exists:
-            var bot = null;
-            for (var k = 0; k < messages.length; k++) {
+            let bot = null;
+            for (let k = 0; k < messages.length; k++) {
                 if (messages[k].trigger === triggers[i]) {
                     bot = messages[k]
                     continue
@@ -103,7 +103,7 @@ app.message(async ({ message }) => {
 
             // Should we be specific ?
             specifics = null 
-            for (var k = 0; k < bot.specific.length; k++) {
+            for (let k = 0; k < bot.specific.length; k++) {
                 if (bot.specific[k].username === poster) {
                     specifics = bot.specific[k].messages
                     continue
@@ -122,11 +122,11 @@ app.message(async ({ message }) => {
                 %username% => user_name
                 %word% => a random word from the original post
             */
-            var words = message.text.split(/\s+/) // Split by whitespace
+            const words = message.text.split(/\s+/) // Split by whitespace
             response = response.replace(/%username%/g, '<@' + poster + '>')
 
             if (words.length > 2) {
-                var randomWord = words[Math.floor(Math.random() * words.length)]
+                const randomWord = words[Math.floor(Math.random() * words.length)]
                 response = response.replace(/%word%/g, randomWord)
             } else {
                 response = response.replace(/%word%/g, '<@' + poster + '>') // Dirty fallback but we have nothing else
@@ -144,8 +144,8 @@ app.message(async ({ message }) => {
     if (!responseObject && message.text && spell_check && spell_check_users.indexOf(poster) >= 0) {
         console.log(`Checking French grammar & syntax for: ${users_display_names[poster]}`)
 
-        var clean_text = message.text.replace(/ *\:[^:]*\: */g, " ") // remove smileys, emoticons
-            clean_text = clean_text.replace(/ *\`\`\`[^:]*\`\`\` */g, " ") // remove code
+        const clean_text = message.text.replace(/ *\:[^:]*\: */g, " ") // remove smileys, emoticons
+                                       .replace(/ *\`\`\`[^:]*\`\`\` */g, " ") // remove code
 
 
         const params = new URLSearchParams();
@@ -158,10 +158,10 @@ app.message(async ({ message }) => {
             const result = await response.json();
             
             if (result.matches.length > 0) {
-                var nb_errors = result.matches.length
+                const nb_errors = result.matches.length
 
-                for (var k = 0; k < nb_errors; k++) {
-                    var ob = result.matches[k]
+                for (let k = 0; k < nb_errors; k++) {
+                    let ob = result.matches[k]
 
                     // We ignore some categories
                     if (spell_check_ignored_categories.indexOf(ob.rule.category.id) >= 0) {
