@@ -187,7 +187,6 @@ app.message(async ({ message }) => {
     if (responseObject) {
         // Post a message if needed
         console.log(`💬 Responding to ${users_display_names[poster] || poster} (on ${channels_display_names[message.channel] || message.channel}):`)
-        console.log(responseObject)
         try {
             const result = await app.client.chat.postMessage({
               token: process.env.SLACK_BOT_TOKEN,
