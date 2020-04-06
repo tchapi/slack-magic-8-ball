@@ -123,13 +123,13 @@ app.message(async ({ message }) => {
                 %word% => a random word from the original post
             */
             const words = message.text.split(/\s+/) // Split by whitespace
-            response = response.replace(/%username%/g, '@' + poster)
+            response = response.replace(/%username%/g, '<@' + poster + '>')
 
             if (words.length > 2) {
                 const randomWord = words[Math.floor(Math.random() * words.length)]
                 response = response.replace(/%word%/g, randomWord)
             } else {
-                response = response.replace(/%word%/g, '@' + poster) // Dirty fallback but we have nothing else
+                response = response.replace(/%word%/g, '<@' + poster + '>') // Dirty fallback but we have nothing else
             }
 
             responseObject = {
