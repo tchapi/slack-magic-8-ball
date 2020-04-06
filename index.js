@@ -168,7 +168,7 @@ app.message(async ({ message }) => {
                         continue;
                     }
 
-                    text = '> ... ' + clean_text.substring(ob.offset, ob.offset + ob['length']) + ' ...' + '\n' + '_(@' + poster + ', ' + ob.message.toLowerCase() + /*' — ' + ob.ruleId +*/')_'
+                    text = '> ... ' + clean_text.substring(ob.offset, ob.offset + ob['length']) + ' ...' + '\n' + '_(<@' + poster + '>, ' + ob.message.toLowerCase() + /*' — ' + ob.ruleId +*/')_'
                     console.log(`Triggered Rule ID: ${ob.rule.id} (Category: ${ob.rule.category.id})`)
 
                     responseObject = {
