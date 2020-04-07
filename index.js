@@ -122,7 +122,9 @@ app.message(async ({ message }) => {
                 %username% => user_name
                 %word% => a random word from the original post
             */
-            const words = message.text.split(/\s+/) // Split by whitespace
+            let words = message.text.split(/\s+/) // Split by whitespace
+            // Only retain words of more than 3 characters
+            words = words.filter(x => x.length > 2)
             response = response.replace(/%username%/g, '<@' + poster + '>')
 
             if (words.length > 2) {
