@@ -34,6 +34,4 @@ general.json
 messages.json
 
 
-deploy/*
-!deploy/nginx.conf
-!deploy/slack.supervisor.conf
+deploy/vars.yml
