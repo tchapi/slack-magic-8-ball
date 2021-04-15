@@ -19,7 +19,7 @@ const receiver = new ExpressReceiver({
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   receiver: receiver,
-  logLevel: LogLevel.INFO
+//   logLevel: LogLevel.INFO
 });
 
 receiver.app.use(bodyParser.urlencoded({ extended: false }))
@@ -36,16 +36,18 @@ nunjucks.configure('views', {
 
 let messagesConfig = new CONFIG({filename : 'messages.json'});
 let messages = messagesConfig.getConfig();
-let triggers = messages.map(function(e){return e.trigger});
 
 const generalConfig = new CONFIG({filename : 'general.json'});
+const triggers_per_channel = generalConfig.get('authorized-triggers-per-channels');
 const users_display_names = generalConfig.get('users-display-names');
 const channels_display_names = generalConfig.get('channels-display-names');
 const spell_check = generalConfig.get('spell-check');
 const spell_check_users = generalConfig.get('spell-check-users');
 const spell_check_ignored_categories = generalConfig.get('spell_check_ignored_categories');
 
-console.log('🧰 Available triggers:', triggers)
+for (const channel_id in triggers_per_channel) {
+    console.log(`🧰 Available triggers for channel ${channels_display_names[channel_id]}:`, triggers_per_channel[channel_id]);
+}
 
 if (spell_check) {
     console.log('🔤 Spell-checking active for:', spell_check_users)
@@ -84,16 +86,23 @@ app.message(async ({ message }) => {
     // Poster
     poster = message.user
 
+    // Retrieve available triggers for the channel the message was posted to
+    const triggers = triggers_per_channel[message.channel];
+
+    if (!triggers) {
+        return
+    }
+
     for (let i = triggers.length - 1; i >= 0; i--) {
 
         if (message.text && message.text.toLowerCase().indexOf(triggers[i]) >= 0) {
 
             // Search for the correct bot — we know it exists:
             let bot = null;
-            for (let k = 0; k < messages.length; k++) {
+            searchBot: for (let k = 0; k < messages.length; k++) {
                 if (messages[k].trigger === triggers[i]) {
                     bot = messages[k]
-                    continue
+                    break searchBot
                 }
             }
 
@@ -101,19 +110,39 @@ app.message(async ({ message }) => {
                 continue
             }
 
-            // Should we be specific ?
-            specifics = null 
-            for (let k = 0; k < bot.specific.length; k++) {
-                if (bot.specific[k].username === poster) {
-                    specifics = bot.specific[k].messages
-                    continue
+            // Do we have answers ?
+            answers = null
+            searchAnswers: for (let r = 0; r < bot.answers.length; r++) {
+                // If the message contains one of the keyword
+                for (var w of bot.answers[r].keywords) {
+                    if (answers === null && message.text.toLowerCase().indexOf(w) >= 0) {
+                        // Choose a random answer
+                        answers = bot.answers[r].answers
+                        break searchAnswers
+                    }
                 }
             }
-            specific = Math.random() < 0.1 ? (specifics !== null && specifics.length > 0): false
-            if (specific) {
-                response = specifics[Math.floor(Math.random() * specifics.length)]
+
+            if (answers) {
+                response = answers[Math.floor(Math.random() * answers.length)]
             } else {
-                response = bot.general[Math.floor(Math.random() * bot.general.length)]
+                // Do we have specifics ?
+                specifics = null 
+                searchSpecifics: for (let k = 0; k < bot.specific.length; k++) {
+                    if (bot.specific[k].username === poster) {
+                        specifics = bot.specific[k].messages
+                        break searchSpecifics
+                    }
+                }
+
+                // _Should_ it be specific ?
+                specific = Math.random() < 0.1 ? (specifics !== null && specifics.length > 0): false
+
+                if (specific) {
+                    response = specifics[Math.floor(Math.random() * specifics.length)]
+                } else {
+                    response = bot.general[Math.floor(Math.random() * bot.general.length)]
+                }
             }
 
             // Replace placeholders
@@ -121,6 +150,8 @@ app.message(async ({ message }) => {
                 Currently supported :
                 %username% => user_name
                 %word% => a random word from the original post
+                %random_article% => a random Wikipedia article
+                %random_int% => a formatted random int between 1 and 1000
             */
             let words = message.text.split(/\s+/) // Split by whitespace
             // Only retain words of more than 3 characters
@@ -132,6 +163,17 @@ app.message(async ({ message }) => {
                 response = response.replace(/%word%/g, randomWord)
             } else {
                 response = response.replace(/%word%/g, '<@' + poster + '>') // Dirty fallback but we have nothing else
+            }
+
+            response = response.replace(/%random_int%/g, new Intl.NumberFormat().format(Math.floor(10 * Math.random() * 100) + 1))
+            
+            if (response.toLowerCase().indexOf('%random_article%') >= 0) {
+                const wikimedia_article = await fetch('https://fr.wikipedia.org/wiki/Special:Random')
+                if (wikimedia_article.url) {
+                    response = response.replace(/%random_article%/g, wikimedia_article.url)
+                } else {
+                    response = response.replace(/%random_article%/g, "https://perdu.com")
+                }
             }
 
             responseObject = {
@@ -188,7 +230,7 @@ app.message(async ({ message }) => {
 
     if (responseObject) {
         // Post a message if needed
-        console.log(`💬 Responding to ${users_display_names[poster] || poster} (on ${channels_display_names[message.channel] || message.channel}):`)
+        console.log(`💬 Responding to ${users_display_names[poster] || poster} (on ${channels_display_names[message.channel] || message.channel}): ${responseObject.text}`)
         try {
             const result = await app.client.chat.postMessage({
               token: process.env.SLACK_BOT_TOKEN,

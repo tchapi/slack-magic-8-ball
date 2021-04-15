@@ -1,4 +1,10 @@
 {
+  "authorized-triggers-per-channels": {
+    "SLACK_ID": [
+      "#trigger1",
+      "#trigger2"
+    ],
+  },
   "users-display-names": {
     "SLACK_ID": "display_name"
   },
