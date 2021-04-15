@@ -1,0 +1,6 @@
+{
+  "port" : 5000, 
+  "api_token" : "xoxb-123456789",
+  "payload_token" : "p...............X",
+  "domain" : "my-domain"
+}
