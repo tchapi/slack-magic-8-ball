@@ -112,10 +112,12 @@ app.message(async ({ message }) => {
 
             // Do we have answers ?
             answers = null
+            isInterrogative = message.text.indexOf('?') >= 0
             searchAnswers: for (let r = 0; r < bot.answers.length; r++) {
                 // If the message contains one of the keyword
                 for (var w of bot.answers[r].keywords) {
-                    if (answers === null && message.text.toLowerCase().indexOf(w) >= 0) {
+                    const mustBeInterrogative = bot.answers[r].mustBeInterrogative
+                    if (answers === null && message.text.toLowerCase().indexOf(w) >= 0 && (mustBeInterrogative === null || (isInterrogative === mustBeInterrogative))) {
                         // Choose a random answer
                         answers = bot.answers[r].answers
                         break searchAnswers
@@ -165,7 +167,7 @@ app.message(async ({ message }) => {
                 response = response.replace(/%word%/g, '<@' + poster + '>') // Dirty fallback but we have nothing else
             }
 
-            response = response.replace(/%random_int%/g, new Intl.NumberFormat().format(Math.floor(10 * Math.random() * 100) + 1))
+            response = response.replace(/%random_int%/g, new Intl.NumberFormat().format(10 * Math.floor(Math.random() * 100) + 1))
             
             if (response.toLowerCase().indexOf('%random_article%') >= 0) {
                 const wikimedia_article = await fetch('https://fr.wikipedia.org/wiki/Special:Random')
