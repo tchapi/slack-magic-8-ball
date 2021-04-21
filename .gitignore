@@ -31,7 +31,6 @@ node_modules
 # specific
 general.json
 messages.json
-config.json
 
 .env
 deploy/*
