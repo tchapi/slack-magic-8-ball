@@ -1,0 +1,9 @@
+{
+  "apps": [{
+    "name": "slack",
+    "script": "./index.js",
+    "cwd": "./current",
+    "error_file": "../logs/app.err.log",
+    "restartDelay": 1000
+  }]
+}

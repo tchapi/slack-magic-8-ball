@@ -32,7 +32,6 @@ node_modules
 general.json
 messages.json
 
+
+deploy/vars.yml
 .env
-deploy/*
-!deploy/nginx.conf
-!deploy/slack.supervisor.conf
