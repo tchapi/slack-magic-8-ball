@@ -1,7 +1,8 @@
 {
   "name": "slack-magic-8-ball",
   "version": "2.0.0",
-  "description": "",
+  "description": "A slackbot that automatically respond to trigger words invocations",
+  "author": "tchapi",
   "main": "index.js",
   "engines": {
     "node": ">=16.0.0"
@@ -10,7 +11,6 @@
     "start": "node index",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
   "license": "ISC",
   "dependencies": {
     "@slack/bolt": "^3.9.0",
