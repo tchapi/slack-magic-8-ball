@@ -10,6 +10,12 @@ const dotenv = require('dotenv')
 const CONFIG = require('./services/ConfigParser')
 
 dotenv.config()
+
+if (!process.env.SLACK_BOT_TOKEN || !process.env.SLACK_SIGNING_SECRET || !process.env.ACCESS_TOKEN) {
+    console.error('Error: You must provide a SLACK_BOT_TOKEN, a SLACK_SIGNING_SECRET and an ACCESS_TOKEN in your .env file.')
+    return
+}
+
 console.log('🛠  Config read from .env file')
 
 const receiver = new ExpressReceiver({

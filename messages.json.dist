@@ -17,11 +17,47 @@
           ]
         }
       ],
+      "answers": [
+            {
+                "keywords": ["good night", "bye"],
+                "mustBeInterrogative": false,
+                "answers": [
+                    "Good Night"
+                ]
+            },
+            {
+                "keywords": ["container", "contain"],
+                "mustBeInterrogative": null,
+                "answers": [
+                    "I respond a random int %random_int% and a random Wikipedia article %random_article%",
+                    "Stop saying this word !"
+                ]
+            },
+            {
+                "keywords": ["where"],
+                "mustBeInterrogative": true,
+                "answers": [
+                    "here",
+                    "somewhere",
+                    "I'ts a secret %username%"
+                ]
+            }
+      ],
       "general": [
           "Hi guys",
           "Yes I'm here", 
           "Did you just say %word% ?", 
-          "Hello <%username%> !"
+          "Hello %username% !"
+      ]
+    },
+    {
+      "trigger": "#otherTriggerWord",
+      "username": "User name 2",
+      "icon_url": "https://url.of.picture",
+      "specific": [],
+      "answers": [],
+      "general": [
+          "Hi there,"
       ]
     }
 ]
