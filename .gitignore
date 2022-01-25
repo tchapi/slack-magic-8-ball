@@ -33,5 +33,6 @@ general.json
 messages.json
 
 
+deploy/*.prod.json
 deploy/vars.yml
 .env
