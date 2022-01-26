@@ -34,5 +34,6 @@ messages.json
 
 
 deploy/*.prod.json
+deploy/.env*
 deploy/vars.yml
 .env
