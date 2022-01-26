@@ -33,11 +33,6 @@
         src={{ shared_path }}/.env
         dest={{ release_path }}/.env
         state=link
-    # - name: Link config.json file
-    #   file:
-    #     src={{ shared_path }}/config.json
-    #     dest={{ release_path }}/config.json
-    #     state=link
     - name: Link general.json file
       file:
         src={{ shared_path }}/general.json
