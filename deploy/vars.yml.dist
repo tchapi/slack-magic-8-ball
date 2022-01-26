@@ -1,2 +1,3 @@
 slack_hosts: frontend_node
 project_path: /var/www/slack-magic-ball
+app_name: slack-magic-ball

@@ -28,16 +28,16 @@
       git:
         repo: "git@github.com:tchapi/slack-magic-8-ball.git"
         dest: "{{ release_path }}"
-    # - name: Link .env file
-    #   file:
-    #     src={{ shared_path }}/.env
-    #     dest={{ release_path }}/.env
-    #     state=link
-    - name: Link config.json file
+    - name: Link .env file
       file:
-        src={{ shared_path }}/config.json
-        dest={{ release_path }}/config.json
+        src={{ shared_path }}/.env
+        dest={{ release_path }}/.env
         state=link
+    # - name: Link config.json file
+    #   file:
+    #     src={{ shared_path }}/config.json
+    #     dest={{ release_path }}/config.json
+    #     state=link
     - name: Link general.json file
       file:
         src={{ shared_path }}/general.json
@@ -49,13 +49,19 @@
         dest={{ release_path }}/messages.json
         state=link
     - name: Update npm
-      npm:
+      yarn:
         path={{ release_path }}
     - name: Stop the API via pm2
-      shell: pm2 stop slack
+      shell: "pm2 stop {{ app_name }}"
       ignore_errors: yes
       args:
         chdir: "{{ project_path }}"
+    - name: Put correct app name
+      replace:
+        path: "{{ release_path }}/ecosystem.json"
+        regexp: 'slack-magic-8ball'
+        replace: "{{ app_name }}"
+        backup: no
     - name: Update symlink
       file:
         src={{ release_path }}

@@ -1,6 +1,6 @@
 {
   "apps": [{
-    "name": "slack",
+    "name": "slack-magic-8ball",
     "script": "./index.js",
     "cwd": "./current",
     "error_file": "../logs/app.err.log",
