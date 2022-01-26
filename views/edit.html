@@ -62,6 +62,36 @@
                 }
               ]
             },
+            answers: {
+              type: "array",
+              title: "Contextual answers",
+              items: {
+                headerTemplate: "Contextual answers #\{\{i1\}\}",
+                type: "object",
+                properties: {
+                  keywords: {
+                    title: "Keywords to trigger this answer",
+                    type: "array",
+                    items: {
+                      headerTemplate: "Keyword #\{\{i1\}\}",
+                      type: "string"
+                    }
+                  },
+                  mustBeInterrogative: {
+                    title: "Must the trigger be an interrogative form ?",
+                    type: "boolean",
+                  },
+                  messages: {
+                    title: "Messages",
+                    type: "array",
+                    items: {
+                      headerTemplate: "Answer #\{\{i1\}\}",
+                      type: "string"
+                    }
+                  }
+                }
+              }
+            },
             specific: {
               type: "array",
               title: "Specifics",
@@ -76,10 +106,10 @@
                   messages: {
                     type: "array",
                     title: "Messages",
-                      items: {
-                        headerTemplate: "Message #\{\{i1\}\}",
-                       type: "string"
-                      }
+                    items: {
+                      headerTemplate: "Message #\{\{i1\}\}",
+                      type: "string"
+                    }
                   }
                 }
               }

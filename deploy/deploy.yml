@@ -48,7 +48,7 @@
         src={{ shared_path }}/messages.json
         dest={{ release_path }}/messages.json
         state=link
-    - name: Update npm
+    - name: Update dependencies
       yarn:
         path={{ release_path }}
     - name: Stop the API via pm2
